@@ -18,6 +18,7 @@ import {
   CreditCard,
   Building2,
   CheckCircle2,
+  Phone,
 } from "lucide-react";
 import { useCart } from "@/components/CartContext";
 import { useAuth } from "@/context/AuthContext";
@@ -28,7 +29,6 @@ import {
   addSavedAddress,
   setDefaultSavedAddress,
 } from "@/lib/addresses";
-import { loadRazorpayScript } from "@/lib/razorpay";
 
 // Helper to calculate expected delivery date string
 function getDeliveryDateString(minDays = 3, maxDays = 5) {
@@ -77,7 +77,7 @@ export default function CartPage() {
   });
 
   // Payment method
-  const [paymentMethod, setPaymentMethod] = useState("RAZORPAY");
+  const [paymentMethod, setPaymentMethod] = useState("PAY_AFTER_CONTACT");
 
   // Submission / error state
   const [submitting, setSubmitting] = useState(false);
@@ -189,7 +189,7 @@ export default function CartPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Step 3: Place real order (Razorpay or COD)
+  // Step 3: Place real order without payment
   const handlePlaceOrder = async () => {
     setError("");
     setSubmitting(true);
@@ -207,7 +207,9 @@ export default function CartPage() {
       customerPhone: activeAddr.phone.trim(),
       customerEmail: activeAddr.email ? activeAddr.email.trim() : (user?.email || undefined),
       shippingAddress: formattedAddress,
-      paymentMethod,
+      paymentMethod: "PAY_AFTER_CONTACT",
+      paymentStatus: "UNPAID",
+      notes: "Direct order placed. Payment pending (Our team will contact customer).",
       items: items.map((i) => ({
         productId: i.id,
         productName: i.name,
@@ -218,93 +220,6 @@ export default function CartPage() {
       })),
     };
 
-    // RAZORPAY PAYMENT FLOW
-    if (paymentMethod === "RAZORPAY") {
-      try {
-        const isLoaded = await loadRazorpayScript();
-        if (!isLoaded || typeof window.Razorpay === "undefined") {
-          throw new Error("Razorpay checkout SDK failed to load. Please check your internet connection.");
-        }
-
-        // 1. Create order on backend (receives razorpay order ID and key ID)
-        const rzpOrderRes = await api.razorpay.createOrder(total, undefined, {
-          customerName: activeAddr.name.trim(),
-          phone: activeAddr.phone.trim(),
-        });
-        const rzpOrder = rzpOrderRes?.data || rzpOrderRes;
-
-        if (!rzpOrder?.id) {
-          throw new Error("Failed to initialize Razorpay checkout session on server.");
-        }
-
-        const options = {
-          key: rzpOrder.keyId || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_ThMMNStuG17mBM",
-          amount: rzpOrder.amount,
-          currency: rzpOrder.currency || "INR",
-          name: "Krishna Textiles Pvt Ltd",
-          description: `Order Payment (${items.length} product${items.length > 1 ? "s" : ""})`,
-          order_id: rzpOrder.id,
-          prefill: {
-            name: activeAddr.name.trim(),
-            contact: activeAddr.phone.trim(),
-            email: activeAddr.email ? activeAddr.email.trim() : (user?.email || ""),
-          },
-          notes: {
-            shippingAddress: formattedAddress,
-            app: "Krishna Textiles Direct Mill Storefront",
-          },
-          theme: {
-            color: "#0c2340", // Brand Navy
-          },
-          handler: async function (response) {
-            try {
-              setSubmitting(true);
-              const verifyRes = await api.razorpay.verifyPayment({
-                razorpayOrderId: response.razorpay_order_id,
-                razorpayPaymentId: response.razorpay_payment_id,
-                razorpaySignature: response.razorpay_signature,
-                orderData: payload,
-              });
-
-              if (verifyRes?.data) {
-                setPlacedOrder(verifyRes.data);
-                clearCart();
-                window.scrollTo({ top: 0, behavior: "smooth" });
-              } else {
-                throw new Error("Payment verified, but server order record creation failed.");
-              }
-            } catch (vErr) {
-              console.error("Razorpay verification failed:", vErr);
-              setError(vErr.message || "Payment verification failed. Please contact mill customer support.");
-            } finally {
-              setSubmitting(false);
-            }
-          },
-          modal: {
-            ondismiss: function () {
-              setSubmitting(false);
-            },
-          },
-        };
-
-        const razorpayInstance = new window.Razorpay(options);
-        razorpayInstance.on("payment.failed", function (resp) {
-          console.error("Razorpay payment failure event:", resp);
-          setError(
-            resp.error?.description || "Payment was declined or cancelled. Please try again."
-          );
-          setSubmitting(false);
-        });
-        razorpayInstance.open();
-      } catch (err) {
-        console.error("Razorpay initiation error:", err);
-        setError(err.message || "Failed to initialize payment gateway. Please try again.");
-        setSubmitting(false);
-      }
-      return;
-    }
-
-    // CASH ON DELIVERY / OFFLINE BANK FLOW
     try {
       const res = await api.orders.create(payload);
       if (res?.data) {
@@ -325,21 +240,36 @@ export default function CartPage() {
   // ORDER SUCCESS VIEW
   if (placedOrder) {
     return (
-      <div className="container-x py-16 text-center max-w-xl mx-auto">
-        <div className="w-16 h-16 rounded-full bg-green-100 text-green-700 flex items-center justify-center mx-auto mb-4 font-black text-2xl shadow-sm">
+      <div className="container-x py-14 text-center max-w-xl mx-auto animate-in fade-in duration-300">
+        <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto mb-4 font-black text-2xl shadow-sm">
           ✓
         </div>
-        <h1 className="text-2xl font-extrabold text-[#0c2340] mb-2">
+        <h1 className="text-2xl font-black text-[#0c2340] mb-2 tracking-tight">
           Order Placed Successfully!
         </h1>
         <p className="text-xs text-slate-500 mb-6 leading-relaxed">
-          Your order has been recorded in the database and submitted to our Tiruppur mill fulfillment queue.
+          Your order has been recorded in our database with 9-digit ID #{placedOrder.orderNumber}.
         </p>
 
-        <div className="bg-white border border-slate-200 rounded-xl p-6 mb-6 text-xs text-left space-y-3 shadow-sm">
+        {/* Special User-Requested Confirmation Note */}
+        <div className="bg-gradient-to-r from-emerald-50 via-teal-50/70 to-emerald-50 border-2 border-emerald-500/40 rounded-2xl p-5 mb-6 text-emerald-950 shadow-md text-left flex items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+            <CheckCircle2 size={22} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-extrabold text-sm text-emerald-950 mb-1">
+              Order placed successfully! Our team will contact you.
+            </h3>
+            <p className="text-xs text-emerald-800 leading-relaxed font-normal">
+              Your order has been confirmed with zero advance payment required today. Our customer fulfillment team will contact you shortly on <strong className="font-mono text-emerald-950 font-bold">{placedOrder.customerPhone}</strong> to verify specifications, give delivery updates, and assist with payment.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 mb-6 text-xs text-left space-y-3 shadow-sm">
           <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
             <span className="text-slate-500 font-medium">Order Reference:</span>
-            <span className="font-mono font-extrabold text-[#0c2340] text-sm bg-slate-100 px-2 py-0.5 rounded">
+            <span className="font-mono font-extrabold text-[#0c2340] text-sm bg-slate-100 px-2.5 py-0.5 rounded-lg border border-slate-200">
               #{placedOrder.orderNumber}
             </span>
           </div>
@@ -348,14 +278,18 @@ export default function CartPage() {
             <span className="font-bold text-slate-800">{placedOrder.customerName}</span>
           </div>
           <div className="flex justify-between py-1.5 border-b border-slate-100">
-            <span className="text-slate-500 font-medium">Total Paid / Payable:</span>
+            <span className="text-slate-500 font-medium">Mobile Number:</span>
+            <span className="font-mono font-bold text-slate-800">{placedOrder.customerPhone}</span>
+          </div>
+          <div className="flex justify-between py-1.5 border-b border-slate-100">
+            <span className="text-slate-500 font-medium">Total Payable:</span>
             <span className="font-extrabold text-[#0c2340] text-sm">
               ₹{placedOrder.totalAmount?.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between py-1.5 border-b border-slate-100">
             <span className="text-slate-500 font-medium">Expected Delivery:</span>
-            <span className="font-bold text-green-700 flex items-center gap-1">
+            <span className="font-bold text-emerald-700 flex items-center gap-1">
               <Truck size={13} /> {deliveryWindow}
             </span>
           </div>
@@ -368,34 +302,18 @@ export default function CartPage() {
           <div className="flex justify-between py-1.5 border-b border-slate-100">
             <span className="text-slate-500 font-medium">Payment Mode:</span>
             <span className="font-bold text-[#0c2340]">
-              {placedOrder.paymentMethod === "RAZORPAY"
-                ? "Razorpay Online (UPI/Cards/NetBanking)"
-                : placedOrder.paymentMethod === "CASH_ON_DELIVERY"
-                ? "Cash on Delivery (COD)"
-                : placedOrder.paymentMethod || "Online"}
+              Pay on Contact (Direct Mill Order)
             </span>
           </div>
-          {placedOrder.razorpayPaymentId && (
-            <div className="flex justify-between py-1.5 border-b border-slate-100">
-              <span className="text-slate-500 font-medium">Razorpay Payment ID:</span>
-              <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                {placedOrder.razorpayPaymentId}
-              </span>
-            </div>
-          )}
           <div className="flex justify-between py-1.5 border-b border-slate-100">
             <span className="text-slate-500 font-medium">Payment Status:</span>
-            <span className={`font-bold px-2 py-0.5 rounded ${
-              placedOrder.paymentStatus === "PAID"
-                ? "text-emerald-700 bg-emerald-50"
-                : "text-amber-700 bg-amber-50"
-            }`}>
-              {placedOrder.paymentStatus || "PAID"}
+            <span className="font-bold px-2 py-0.5 rounded text-amber-700 bg-amber-50 border border-amber-200">
+              Payment Pending (Admin will update upon payment receipt)
             </span>
           </div>
           <div className="flex justify-between py-1.5">
             <span className="text-slate-500 font-medium">Fulfillment Status:</span>
-            <span className="font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200">
+            <span className="font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded border border-blue-200">
               {placedOrder.status || "CONFIRMED"} (Dispatch Pending)
             </span>
           </div>
@@ -1142,48 +1060,29 @@ export default function CartPage() {
             {/* 4. Payment Method Selection */}
             <div className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm space-y-3">
               <h3 className="font-extrabold text-sm text-[#0c2340] flex items-center gap-2">
-                <CreditCard size={16} className="text-[#0c2340]" />
-                Select Payment Method
+                <CheckCircle2 size={16} className="text-emerald-600" />
+                Zero Advance Payment Checkout
               </h3>
 
-              <div className="space-y-2.5 text-xs">
-                <label
-                  className={`flex items-start gap-3 p-3.5 rounded-lg border cursor-pointer transition-all ${
-                    paymentMethod === "RAZORPAY"
-                      ? "border-[#0c2340] bg-blue-50/50 ring-2 ring-[#0c2340]/20 shadow-sm"
-                      : "border-slate-200 hover:bg-slate-50"
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="RAZORPAY"
-                    checked={paymentMethod === "RAZORPAY"}
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                    className="accent-[#0c2340] cursor-pointer mt-0.5"
-                  />
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between flex-wrap gap-1">
-                      <span className="font-extrabold text-slate-900 text-xs">
-                        Razorpay Secure Checkout
-                      </span>
-                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-full">
-                        Recommended · Instant Verification
-                      </span>
-                    </div>
-                    <span className="text-slate-600 text-[11px] block mt-0.5 leading-relaxed">
-                      UPI (Google Pay, PhonePe, Paytm), Credit & Debit Cards, NetBanking & Wallets
+              <div className="space-y-3 text-xs">
+                <div className="p-4 rounded-xl border border-emerald-300 bg-emerald-50/60 space-y-2.5">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <span className="font-extrabold text-emerald-950 text-xs flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                      Direct Mill Order (No Payment Required Now)
                     </span>
-                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100/80">
-                      <span className="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
-                        256-Bit SSL Encrypted
-                      </span>
-                      <span className="text-[10px] font-semibold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
-                        Test Sandbox Active
-                      </span>
-                    </div>
+                    <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-full">
+                      Zero Advance
+                    </span>
                   </div>
-                </label>
+                  <p className="text-emerald-900 text-[11px] leading-relaxed">
+                    You do not need to make any payment right now to place this order. After you place the order, our team will review the products and contact you directly on your phone to confirm details, answer questions, and guide you through payment.
+                  </p>
+                  <div className="flex items-center gap-2 pt-2 border-t border-emerald-200/70 text-[11px] font-semibold text-emerald-900">
+                    <Phone size={13} className="text-emerald-700" />
+                    <span>Our team will contact you right after your order is placed</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -1232,15 +1131,11 @@ export default function CartPage() {
               className="btn-red w-full py-3.5 rounded font-bold text-xs flex items-center justify-center gap-2 shadow disabled:opacity-60 cursor-pointer"
             >
               {submitting ? (
-                <span>{paymentMethod === "RAZORPAY" ? "Connecting to Razorpay..." : "Placing Order in Database..."}</span>
+                <span>Placing Order in Database...</span>
               ) : (
                 <>
                   <CheckCircle2 size={16} />
-                  <span>
-                    {paymentMethod === "RAZORPAY"
-                      ? `Pay ₹${total.toLocaleString()} via Razorpay`
-                      : `Confirm & Place Order (₹${total.toLocaleString()})`}
-                  </span>
+                  <span>Place Order (No Payment Required)</span>
                 </>
               )}
             </button>
