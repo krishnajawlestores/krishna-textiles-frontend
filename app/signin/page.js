@@ -80,7 +80,7 @@ export default function SignInPage() {
             {/* Logo */}
             <Link href="/" className="inline-block mb-8">
               <Image
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="Krishna Textiles"
                 width={170}
                 height={45}

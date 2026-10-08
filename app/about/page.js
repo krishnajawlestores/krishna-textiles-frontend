@@ -30,7 +30,7 @@ export default function AboutPage() {
             {cmsPage?.title || "Our Story"}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-sm leading-relaxed">
-            Krishna Textiles began in the textile heartland of Erode &amp; Tiruppur, growing into a premier direct-mill sourcing and wholesale distribution hub across India.
+            Krishna Textiles is based at 39, Parupukkara Street, Tiruchirappalli, sourcing directly from the textile manufacturing hubs of Erode &amp; Tiruppur to supply premium wholesale and retail textiles across India.
           </p>
         </div>
       </div>

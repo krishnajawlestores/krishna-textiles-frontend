@@ -40,7 +40,7 @@ export default function ContactPage() {
             <div>
               <p className="font-semibold text-navy text-sm">Visit Us</p>
               <p className="text-sm text-gray-600">
-                Krishna Textiles, Textile Market Road, Erode, Tamil Nadu, India
+                Krishna Textiles, 39, Parupukkara St, Tiruchirappalli, Tamil Nadu, 620001
               </p>
             </div>
           </div>

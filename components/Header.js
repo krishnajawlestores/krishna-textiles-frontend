@@ -370,7 +370,7 @@ export default function Header() {
             {/* Brand Logo */}
             <Link href="/" className="flex items-center shrink-0 select-none">
               <Image
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="Krishna Textiles"
                 width={170}
                 height={45}
@@ -659,7 +659,7 @@ export default function Header() {
               <div className="p-4 bg-[#0c2340] text-white flex items-center justify-between border-b border-white/10">
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
                   <Image
-                    src="/logo.png"
+                    src="/logo.png?v=2"
                     alt="Krishna Textiles"
                     width={150}
                     height={40}

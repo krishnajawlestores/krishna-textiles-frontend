@@ -169,7 +169,7 @@ export default function Footer() {
           <div className="lg:col-span-2 space-y-3">
             <Link href="/" className="inline-block">
               <Image
-                src="/logo.png"
+                src="/logo.png?v=2"
                 alt="Krishna Textiles"
                 width={180}
                 height={48}
@@ -190,7 +190,7 @@ export default function Footer() {
                 <Mail size={13} className="text-[#c59b27]" /> support@krishnatextiles.in
               </div>
               <div className="flex items-center gap-2 text-slate-300">
-                <MapPin size={13} className="text-green-500" /> Erode Textile Market, Tamil Nadu, 638001
+                <MapPin size={13} className="text-green-500" /> 39, Parupukkara St, Tiruchirappalli, Tamil Nadu, 620001
               </div>
             </div>
 
