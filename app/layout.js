@@ -5,35 +5,74 @@ import { AuthProvider } from "@/context/AuthContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://krishnatextiles.in"),
-  title: "Krishna Textiles | Tiruchirappalli Wholesale & Retail Textiles",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in"),
+  title: {
+    default: "Krishna Jawli Stores | Tiruchirappalli Wholesale & Retail Textiles",
+    template: "%s | Krishna Jawli Stores",
+  },
   description:
-    "Krishna Textiles, 39, Parupukkara St, Tiruchirappalli, Tamil Nadu. Quality textiles sourced from Erode & Tiruppur mills at wholesale and retail prices with pan-India delivery.",
+    "Krishna Jawli Stores (Krishna Textiles), 39, Parupukkara St, Tiruchirappalli, Tamil Nadu. Quality textiles, dhotis, sarees & fabrics sourced directly from Erode & Tiruppur mills at wholesale and retail prices.",
+  keywords: [
+    "Krishna Jawli Stores",
+    "Krishna Jawli Stores Trichy",
+    "Krishna Jawli Stores Tiruchirappalli",
+    "Krishna Textiles Trichy",
+    "39 Parupukkara St",
+    "Parupukkara street jawli store",
+    "wholesale textiles Trichy",
+    "pure cotton dhotis online",
+    "cotton sarees wholesale",
+    "lungis Tiruppur Erode",
+    "Tamil Nadu textile supplier",
+  ],
+  alternates: {
+    canonical: "./",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   openGraph: {
-    title: "Krishna Textiles | Tiruchirappalli Wholesale & Retail Textiles",
+    title: "Krishna Jawli Stores | Tiruchirappalli Wholesale & Retail Textiles",
     description:
-      "Krishna Textiles, 39, Parupukkara St, Tiruchirappalli. Quality textiles, sarees, dhotis, and fabrics at factory prices.",
-    url: "https://krishnatextiles.in",
-    siteName: "Krishna Textiles",
+      "Krishna Jawli Stores, 39, Parupukkara St, Tiruchirappalli. Quality textiles, sarees, dhotis, and fabrics at factory prices with all-India shipping.",
+    url: "https://krishnajawlistores.in",
+    siteName: "Krishna Jawli Stores",
     images: [
       {
         url: "/logo.png?v=2",
         width: 600,
         height: 200,
-        alt: "Krishna Textiles Logo",
+        alt: "Krishna Jawli Stores Logo",
       },
     ],
     locale: "en_IN",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Krishna Jawli Stores | Tiruchirappalli Wholesale & Retail Textiles",
+    description:
+      "Krishna Jawli Stores, 39, Parupukkara St, Tiruchirappalli. Wholesale & retail textile store.",
+    images: ["/logo.png?v=2"],
   },
 };
 
 const storeSchema = {
   "@context": "https://schema.org",
   "@type": "ClothingStore",
-  name: "Krishna Textiles",
-  image: "https://krishnatextiles.in/logo.png?v=2",
-  telephone: "+91 98765 43210",
+  name: "Krishna Jawli Stores",
+  alternateName: "Krishna Textiles",
+  url: "https://krishnajawlistores.in",
+  image: "https://krishnajawlistores.in/logo.png?v=2",
+  telephone: "+91 90253 11314",
   address: {
     "@type": "PostalAddress",
     streetAddress: "39, Parupukkara St",

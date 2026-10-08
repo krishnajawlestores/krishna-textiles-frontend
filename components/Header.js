@@ -815,7 +815,7 @@ export default function Header() {
               {/* Bottom Support Box */}
               <div className="p-3.5 bg-slate-50 border-t border-slate-200 text-xs text-slate-600">
                 <div className="flex items-center gap-2 font-bold text-slate-800 mb-1">
-                  <Phone size={13} className="text-[#d32f2f]" /> Helpline: +91 98765 43210
+                  <Phone size={13} className="text-[#d32f2f]" /> Helpline: +91 90253 11314
                 </div>
                 <p className="text-[11px] text-slate-500">
                   Erode & Tiruppur Sourced · 100% Genuine

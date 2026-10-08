@@ -184,10 +184,7 @@ export default function Footer() {
 
             <div className="space-y-1.5 pt-2 text-xs">
               <div className="flex items-center gap-2 text-slate-300">
-                <Phone size={13} className="text-[#d32f2f]" /> +91 98765 43210 (6 Days, 9am - 8pm)
-              </div>
-              <div className="flex items-center gap-2 text-slate-300">
-                <Mail size={13} className="text-[#c59b27]" /> support@krishnatextiles.in
+                <Phone size={13} className="text-[#d32f2f]" /> +91 90253 11314 (6 Days, 9am - 8pm)
               </div>
               <div className="flex items-center gap-2 text-slate-300">
                 <MapPin size={13} className="text-green-500" /> 39, Parupukkara St, Tiruchirappalli, Tamil Nadu, 620001

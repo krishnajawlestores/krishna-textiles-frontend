@@ -125,7 +125,7 @@ export default function WholesalePage() {
                       name="phone"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="+91 98765 43210"
+                      placeholder="+91 9XXXX XXXXX"
                       className="w-full border border-slate-300 rounded px-3 py-2 text-slate-800 outline-none focus:border-[#0c2340]"
                     />
                   </div>
@@ -199,10 +199,7 @@ export default function WholesalePage() {
               <p className="text-slate-300 text-[11px]">Speak directly with our senior trade specialist:</p>
               <div className="pt-2 border-t border-white/10 space-y-1.5 font-semibold text-slate-200">
                 <p className="flex items-center gap-2">
-                  <Phone size={13} className="text-[#c59b27]" /> +91 98765 43210
-                </p>
-                <p className="flex items-center gap-2">
-                  <Mail size={13} className="text-[#c59b27]" /> wholesale@krishnatextiles.in
+                  <Phone size={13} className="text-[#c59b27]" /> +91 90253 11314
                 </p>
               </div>
             </div>

@@ -25,14 +25,7 @@ export default function ContactPage() {
             <Phone className="text-navy mt-0.5" size={20} />
             <div>
               <p className="font-semibold text-navy text-sm">Call Us</p>
-              <p className="text-sm text-gray-600">+91 98765 43210</p>
-            </div>
-          </div>
-          <div className="card p-5 flex items-start gap-3">
-            <Mail className="text-navy mt-0.5" size={20} />
-            <div>
-              <p className="font-semibold text-navy text-sm">Email Us</p>
-              <p className="text-sm text-gray-600">support@krishnatextiles.in</p>
+              <p className="text-sm text-gray-600">+91 90253 11314</p>
             </div>
           </div>
           <div className="card p-5 flex items-start gap-3">
@@ -40,7 +33,7 @@ export default function ContactPage() {
             <div>
               <p className="font-semibold text-navy text-sm">Visit Us</p>
               <p className="text-sm text-gray-600">
-                Krishna Textiles, 39, Parupukkara St, Tiruchirappalli, Tamil Nadu, 620001
+                Krishna Jawli Stores, 39, Parupukkara St, Tiruchirappalli, Tamil Nadu, 620001
               </p>
             </div>
           </div>
