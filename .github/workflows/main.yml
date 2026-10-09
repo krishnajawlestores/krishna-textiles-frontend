@@ -1,4 +1,4 @@
-name: Store CI
+name: Store CI/CD
 
 on:
   workflow_dispatch:
@@ -8,21 +8,24 @@ on:
     paths-ignore:
       - 'README.md'
 
+concurrency:
+  group: store-production-deploy
+  cancel-in-progress: false
+
 jobs:
-  verify-and-build:
-    name: Verify SSH and build Store image
+  deploy-store:
+    name: Build and deploy Store
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
       - name: Configure SSH
         env:
           VPS_HOST: ${{ secrets.VPS_HOST }}
           VPS_USER: ${{ secrets.VPS_USER }}
           VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
         run: |
+          set -eu
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
           printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/deploy_key
@@ -30,16 +33,89 @@ jobs:
           ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
-      - name: Verify VPS access
+      - name: Verify VPS access and repository state
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o BatchMode=yes \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            'docker --version && test -d /opt/ecommerce/store/app && echo "VPS access verified"'
+          set -eu
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+            "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -eu
+          cd /opt/ecommerce/store/app
+          git status --short --branch
+          test -f Dockerfile
+          test -f .dockerignore
+          test -f /opt/ecommerce/env/store.env
+          docker ps --filter name='^krishna-store$' --format '{{.Names}}' | grep -qx krishna-store
+          echo "Pre-deployment checks passed."
+          REMOTE
 
-      - name: Build Store Docker image on VPS
+      - name: Deploy latest main commit
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
         run: |
-          ssh -i ~/.ssh/deploy_key \
-            -o BatchMode=yes \
-            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
-            'cd /opt/ecommerce/store/app && set -a && . /opt/ecommerce/env/store.env && set +a && docker build --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" --build-arg NEXT_PUBLIC_RAZORPAY_KEY_ID="$NEXT_PUBLIC_RAZORPAY_KEY_ID" --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" -t krishna-jawli-store:ci .'
+          set -eu
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes \
+            "$VPS_USER@$VPS_HOST" 'bash -s' <<'REMOTE'
+          set -eu
+          APP=/opt/ecommerce/store/app
+          ENV_FILE=/opt/ecommerce/env/store.env
+          cd "$APP"
+
+          # Refuse to overwrite unexpected tracked-file changes.
+          if [ -n "$(git diff --name-only)" ] || [ -n "$(git diff --cached --name-only)" ]; then
+            echo "ERROR: Tracked local changes detected. No deployment performed."
+            exit 1
+          fi
+
+          # Preserve the current live image for rollback.
+          OLD_IMAGE_ID=$(docker inspect krishna-store --format '{{.Image}}')
+          OLD_IMAGE_TAG="krishna-jawli-store:rollback-$(date +%Y%m%d%H%M%S)"
+          docker image tag "$OLD_IMAGE_ID" "$OLD_IMAGE_TAG"
+
+          # Update tracked code without deleting untracked Docker files.
+          git fetch origin main
+          git reset --hard origin/main
+
+          set -a
+          . "$ENV_FILE"
+          set +a
+
+          NEW_TAG="krishna-jawli-store:deploy-$(git rev-parse --short HEAD)-$(date +%Y%m%d%H%M%S)"
+
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL="$NEXT_PUBLIC_API_URL" \
+            --build-arg NEXT_PUBLIC_RAZORPAY_KEY_ID="$NEXT_PUBLIC_RAZORPAY_KEY_ID" \
+            --build-arg NEXT_PUBLIC_SITE_URL="$NEXT_PUBLIC_SITE_URL" \
+            -t "$NEW_TAG" .
+
+          # Build succeeded. Recreate the container with the same port and restart policy.
+          docker rm -f krishna-store
+
+          if docker run -d \
+            --name krishna-store \
+            --restart unless-stopped \
+            --network ecommerce-network \
+            -p 127.0.0.1:3000:3000 \
+            "$NEW_TAG"; then
+            for i in $(seq 1 30); do
+              if curl -fsS http://127.0.0.1:3000/ -o /dev/null; then
+                echo "Store deployment healthy: $NEW_TAG"
+                exit 0
+              fi
+              sleep 2
+            done
+          fi
+
+          echo "ERROR: New Store deployment failed. Rolling back."
+          docker rm -f krishna-store >/dev/null 2>&1 || true
+          docker run -d \
+            --name krishna-store \
+            --restart unless-stopped \
+            --network ecommerce-network \
+            -p 127.0.0.1:3000:3000 \
+            "$OLD_IMAGE_TAG"
+          exit 1
+          REMOTE
