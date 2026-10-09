@@ -25,7 +25,7 @@ export async function generateMetadata({ params }) {
   const name = category?.name || formatSlug(params.slug);
 
   const title = `${name} Collection | Krishna Jawli Stores Tiruchirappalli`;
-  const description = `Shop authentic ${name} at Krishna Jawli Stores (Krishna Textiles), 39, Parupukkara St, Tiruchirappalli. Best wholesale & retail mill rates, guaranteed quality, and all-India fast shipping.`;
+  const description = `Shop authentic ${name} at Krishna Jawli Stores, 39, Parupukkara St, Tiruchirappalli. Best wholesale & retail mill rates, guaranteed quality, and all-India fast shipping.`;
 
   return {
     title,
@@ -35,7 +35,7 @@ export async function generateMetadata({ params }) {
       `${name} wholesale`,
       `${name} Tiruchirappalli`,
       "Krishna Jawli Stores",
-      "Krishna Textiles Trichy",
+      "Krishna Jawli Stores Trichy",
       "39 Parupukkara St",
       "textile suppliers Tamil Nadu",
     ],

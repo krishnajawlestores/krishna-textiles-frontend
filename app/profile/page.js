@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -614,7 +614,7 @@ export default function ProfilePage() {
               <div className="space-y-6">
                 <div className="pb-3 border-b border-slate-200">
                   <h2 className="text-base font-extrabold text-[#0c2340]">Account & Business Settings</h2>
-                  <p className="text-xs text-slate-400">Your profile details registered in the Krishna Textiles database</p>
+                  <p className="text-xs text-slate-400">Your profile details registered in the Krishna Jawli Stores database</p>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4 text-xs">
@@ -657,7 +657,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-800">
-                  Profile information is securely synchronized with your verified Krishna Textiles database record.
+                  Profile information is securely synchronized with your verified Krishna Jawli Stores database record.
                 </div>
               </div>
             )}

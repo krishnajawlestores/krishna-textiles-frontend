@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
+﻿const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
 
 export const metadata = {
   title: "Contact & Store Location | Krishna Jawli Stores Tiruchirappalli",
@@ -7,7 +7,7 @@ export const metadata = {
   keywords: [
     "Krishna Jawli Stores address",
     "Krishna Jawli Stores Tiruchirappalli contact",
-    "Krishna Textiles Tiruchirappalli phone number",
+    "Krishna Jawli Stores Tiruchirappalli phone number",
     "39 Parupukkara street Trichy map",
   ],
   openGraph: {

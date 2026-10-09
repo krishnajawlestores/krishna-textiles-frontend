@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
@@ -94,7 +94,7 @@ export default function Hero() {
                   <div className="absolute inset-0 w-full h-full bg-slate-900">
                     <Image
                       src={slide.image || "/hero-textiles-v2.jpg"}
-                      alt={slide.title || "Krishna Textiles"}
+                      alt={slide.title || "Krishna Jawli Stores"}
                       fill
                       sizes="100vw"
                       className="object-cover object-center w-full h-full"

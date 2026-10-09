@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -10,7 +10,7 @@ import testimonials from "@/data/testimonials.json";
 
 const faqs = [
   {
-    q: "How are Krishna Textiles prices lower than market retail?",
+    q: "How are Krishna Jawli Stores prices lower than market retail?",
     a: "We source our products directly from manufacturing mills in Erode and Tiruppur, bypassing multiple layers of regional distributors and middle agents, allowing us to pass factory rates directly to you.",
   },
   {
@@ -68,7 +68,7 @@ export default function InfoStrip() {
           <div className="text-center mb-8">
             <span className="section-tag block mb-1">Real Verified Experiences</span>
             <h2 className="section-title">
-              What Our Customers Say About Krishna Textiles
+              What Our Customers Say About Krishna Jawli Stores
             </h2>
             <p className="section-desc max-w-lg mx-auto">
               Trusted by retail shoppers, textile shop owners, and boutique curators nationwide.

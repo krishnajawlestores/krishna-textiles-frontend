@@ -1,4 +1,4 @@
-import "./globals.css";
+﻿import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { CartProvider } from "@/components/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -11,12 +11,12 @@ export const metadata = {
     template: "%s | Krishna Jawli Stores",
   },
   description:
-    "Krishna Jawli Stores (Krishna Textiles), 39, Parupukkara St, Tiruchirappalli, Tamil Nadu. Quality textiles, dhotis, sarees & fabrics sourced directly from Erode & Tiruppur mills at wholesale and retail prices.",
+    "Krishna Jawli Stores (Krishna Jawli Stores), 39, Parupukkara St, Tiruchirappalli, Tamil Nadu. Quality textiles, dhotis, sarees & fabrics sourced directly from Erode & Tiruppur mills at wholesale and retail prices.",
   keywords: [
     "Krishna Jawli Stores",
     "Krishna Jawli Stores Trichy",
     "Krishna Jawli Stores Tiruchirappalli",
-    "Krishna Textiles Trichy",
+    "Krishna Jawli Stores Trichy",
     "39 Parupukkara St",
     "Parupukkara street jawli store",
     "wholesale textiles Trichy",
@@ -69,7 +69,7 @@ const storeSchema = {
   "@context": "https://schema.org",
   "@type": "ClothingStore",
   name: "Krishna Jawli Stores",
-  alternateName: "Krishna Textiles",
+  alternateName: "Krishna Jawli Stores",
   url: "https://krishnajawlistores.in",
   image: "https://krishnajawlistores.in/logo.png?v=2",
   telephone: "+91 90253 11314",

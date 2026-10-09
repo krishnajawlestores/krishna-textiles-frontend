@@ -35,7 +35,7 @@ export async function generateMetadata({ params }) {
       product.category?.name || "Textiles",
       "Krishna Jawli Stores",
       "Krishna Jawli Stores Tiruchirappalli",
-      "Krishna Textiles Trichy",
+      "Krishna Jawli Stores Trichy",
       "39 Parupukkara St",
       "wholesale price",
     ],
@@ -78,7 +78,7 @@ export default async function ProductLayout({ children, params }) {
       sku: product.sku || String(product.id),
       brand: {
         "@type": "Brand",
-        name: product.brand?.name || "Krishna Textiles",
+        name: product.brand?.name || "Krishna Jawli Stores",
       },
       offers: {
         "@type": "Offer",
@@ -93,7 +93,7 @@ export default async function ProductLayout({ children, params }) {
         seller: {
           "@type": "ClothingStore",
           name: "Krishna Jawli Stores",
-          alternateName: "Krishna Textiles",
+          alternateName: "Krishna Jawli Stores",
           address: {
             "@type": "PostalAddress",
             streetAddress: "39, Parupukkara St",

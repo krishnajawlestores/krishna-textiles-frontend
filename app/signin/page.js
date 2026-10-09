@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -81,7 +81,7 @@ export default function SignInPage() {
             <Link href="/" className="inline-block mb-8">
               <Image
                 src="/logo.png?v=2"
-                alt="Krishna Textiles"
+                alt="Krishna Jawli Stores"
                 width={170}
                 height={45}
                 className="h-10 w-auto object-contain"
@@ -96,7 +96,7 @@ export default function SignInPage() {
             </div>
 
             <h2 className="text-2xl sm:text-3xl font-black leading-tight mb-3 tracking-tight text-white">
-              Welcome back to Krishna Textiles
+              Welcome back to Krishna Jawli Stores
             </h2>
 
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed mb-6 font-medium">
@@ -142,7 +142,7 @@ export default function SignInPage() {
             <div className="mb-6 pb-4 border-b border-slate-100">
               <h1 className="text-2xl font-black text-[#0c2340]">Sign In</h1>
               <p className="text-xs text-slate-500 mt-1">
-                New to Krishna Textiles?{" "}
+                New to Krishna Jawli Stores?{" "}
                 <Link href="/signup" className="text-[#d32f2f] font-bold hover:underline">
                   Create an account
                 </Link>
@@ -241,7 +241,7 @@ export default function SignInPage() {
                   <span>Signing In...</span>
                 ) : (
                   <>
-                    <span>Sign In to Krishna Textiles</span> <ArrowRight size={15} />
+                    <span>Sign In to Krishna Jawli Stores</span> <ArrowRight size={15} />
                   </>
                 )}
               </button>

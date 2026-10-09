@@ -1,6 +1,6 @@
-# Krishna Textiles — Next.js E-commerce Website
+﻿# Krishna Jawli Stores — Next.js E-commerce Website
 
-A fully responsive, JSON-data-driven e-commerce storefront built with **Next.js 14 (App Router)** and **Tailwind CSS**, modeled after the Krishna Textiles UI.
+A fully responsive, JSON-data-driven e-commerce storefront built with **Next.js 14 (App Router)** and **Tailwind CSS**, modeled after the Krishna Jawli Stores UI.
 
 ## Getting Started
 

@@ -1,118 +1,76 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { ChevronRight, CheckCircle2, Loader2 } from "lucide-react";
+import { MapPin, Users, Award, Truck } from "lucide-react";
 import { api } from "@/lib/api";
-import ProductCard from "@/components/ProductCard";
 
-export default function BrandDetailPage({ params }) {
-  const [brand, setBrand] = useState(null);
-  const [brandProducts, setBrandProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+const stats = [
+  { icon: Users, value: "5,000+", label: "Happy Customers" },
+  { icon: Award, value: "10+", label: "Trusted Brands" },
+  { icon: MapPin, value: "6+", label: "Textile Hubs Sourced" },
+  { icon: Truck, value: "All India", label: "Delivery Coverage" },
+];
+
+export default function AboutPage() {
+  const [cmsPage, setCmsPage] = useState(null);
 
   useEffect(() => {
-    async function loadBrandData() {
-      setLoading(true);
-      try {
-        const [brandData, prodData] = await Promise.all([
-          api.brands.getOne(params.id).catch(() => null),
-          api.products.getAll({ brandId: params.id }),
-        ]);
-
-        if (brandData && (brandData.id || brandData.name)) {
-          setBrand(brandData);
-        } else {
-          // Fallback: check all brands
-          const allBrands = await api.brands.getAll();
-          const list = Array.isArray(allBrands) ? allBrands : (allBrands.data || []);
-          const found = list.find((b) => b.id === params.id || b.name.toLowerCase() === params.id.toLowerCase());
-          setBrand(found || null);
-        }
-
-        const prods = Array.isArray(prodData) ? prodData : (prodData.data || []);
-        setBrandProducts(prods);
-      } catch (err) {
-        console.error("Error loading brand details:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadBrandData();
-  }, [params.id]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#f8fafc] flex justify-center items-center py-20">
-        <Loader2 className="animate-spin text-[#0c2340]" size={36} />
-      </div>
-    );
-  }
-
-  if (!brand) {
-    return (
-      <div className="container-x py-16 text-center">
-        <p className="text-xl font-bold text-[#0c2340] mb-4">Brand Not Found</p>
-        <Link href="/brands" className="btn-primary w-fit mx-auto text-xs">
-          Browse Brand Directory
-        </Link>
-      </div>
-    );
-  }
+    api.cms.getPage("about-us")
+      .then((p) => {
+        if (p && p.content) setCmsPage(p);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] py-6">
-      <div className="container-x">
-        <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-4">
-          <Link href="/" className="hover:text-[#0c2340]">Home</Link>
-          <ChevronRight size={12} />
-          <Link href="/brands" className="hover:text-[#0c2340]">Brands</Link>
-          <ChevronRight size={12} />
-          <span className="text-[#0c2340] font-bold">{brand.name}</span>
+    <div>
+      <div className="bg-[#0c2340] text-white">
+        <div className="container-x py-14 text-center">
+          <h1 className="text-3xl sm:text-4xl font-extrabold mb-3">
+            {cmsPage?.title || "Our Story"}
+          </h1>
+          <p className="text-slate-300 max-w-2xl mx-auto text-sm leading-relaxed">
+            Krishna Jawli Stores is based at 39, Parupukkara Street, Tiruchirappalli, sourcing directly from the textile manufacturing hubs of Erode &amp; Tiruppur to supply premium wholesale and retail textiles across India.
+          </p>
         </div>
+      </div>
 
-        <div className="bg-white p-5 rounded border border-slate-200 shadow-sm mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-14 h-14 rounded-lg overflow-hidden border border-slate-200 bg-white flex items-center justify-center shadow shrink-0">
-              {brand.image ? (
-                <img
-                  src={brand.image}
-                  alt={brand.name}
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    e.target.style.display = "none";
-                    if (e.target.nextSibling) e.target.nextSibling.style.display = "flex";
-                  }}
-                />
-              ) : null}
-              <div className={`w-full h-full bg-[#0c2340] text-white font-black text-base items-center justify-center ${brand.image ? "hidden" : "flex"}`}>
-                {brand.name.slice(0, 2).toUpperCase()}
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-extrabold text-[#0c2340]">{brand.name}</h1>
-                <span className="badge-verified">
-                  <CheckCircle2 size={11} /> Authorized
-                </span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">{brand.tagline || `${brand.name} authorized collection`}</p>
-            </div>
+      <div className="container-x py-10 grid sm:grid-cols-4 gap-6">
+        {stats.map((s, i) => (
+          <div key={i} className="bg-white p-6 text-center rounded border border-slate-200 shadow-sm">
+            <s.icon className="mx-auto text-[#0c2340] mb-3" size={26} />
+            <p className="text-xl font-extrabold text-[#0c2340]">{s.value}</p>
+            <p className="text-xs text-slate-500 mt-1">{s.label}</p>
           </div>
-          <span className="text-xs font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-3 py-1 rounded">
-            {brandProducts.length} Products Available
-          </span>
-        </div>
+        ))}
+      </div>
 
-        {brandProducts.length === 0 ? (
-          <div className="bg-white p-12 text-center text-xs text-slate-500 rounded border border-slate-200">
-            No products available for this brand currently.
+      <div className="container-x py-6">
+        {cmsPage?.content ? (
+          <div className="bg-white p-8 rounded border border-slate-200 shadow-sm whitespace-pre-line text-sm text-slate-700 leading-relaxed mb-8">
+            {cmsPage.content}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
-            {brandProducts.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
+            <div className="bg-white p-6 rounded border border-slate-200 shadow-sm">
+              <h2 className="font-bold text-[#0c2340] text-lg mb-3">Our Mission</h2>
+              <p className="text-sm text-slate-600 leading-relaxed">
+                To make high-quality, genuine branded textiles accessible to
+                every household and business in India — by connecting the
+                manufacturing strength of Erode and Tiruppur with a seamless,
+                reliable online shopping experience.
+              </p>
+            </div>
+            <div className="bg-white p-6 rounded border border-slate-200 shadow-sm">
+              <h2 className="font-bold text-[#0c2340] text-lg mb-3">Why Choose Us</h2>
+              <ul className="text-sm text-slate-600 space-y-2 list-disc list-inside">
+                <li>Direct sourcing from Erode &amp; Tiruppur manufacturers</li>
+                <li>100% genuine products from established brands</li>
+                <li>Flexible wholesale &amp; retail purchasing options</li>
+                <li>Reliable, tracked delivery across India</li>
+                <li>Dedicated customer &amp; business support</li>
+              </ul>
+            </div>
           </div>
         )}
       </div>

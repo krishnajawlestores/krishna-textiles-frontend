@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { MapPin, Users, Award, Truck } from "lucide-react";
@@ -30,7 +30,7 @@ export default function AboutPage() {
             {cmsPage?.title || "Our Story"}
           </h1>
           <p className="text-slate-300 max-w-2xl mx-auto text-sm leading-relaxed">
-            Krishna Textiles is based at 39, Parupukkara Street, Tiruchirappalli, sourcing directly from the textile manufacturing hubs of Erode &amp; Tiruppur to supply premium wholesale and retail textiles across India.
+            Krishna Jawli Stores is based at 39, Parupukkara Street, Tiruchirappalli, sourcing directly from the textile manufacturing hubs of Erode &amp; Tiruppur to supply premium wholesale and retail textiles across India.
           </p>
         </div>
       </div>

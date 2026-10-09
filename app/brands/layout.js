@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
+﻿const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
 
 export const metadata = {
   title: "Featured Textile Brands | Krishna Jawli Stores Tiruchirappalli",
@@ -9,7 +9,7 @@ export const metadata = {
     "dhoti brands Tamil Nadu",
     "saree manufacturers",
     "Krishna Jawli Stores brands",
-    "Krishna Textiles brands",
+    "Krishna Jawli Stores brands",
     "Trichy branded clothing",
   ],
   openGraph: {

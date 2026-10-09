@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { Building2, Package, TrendingUp, Handshake, CheckCircle2, Phone, Mail, FileText, ChevronRight } from "lucide-react";
@@ -51,7 +51,7 @@ export default function WholesalePage() {
               Wholesale &amp; Bulk Textile Supply
             </h1>
             <p className="text-slate-300 text-xs sm:text-sm leading-relaxed">
-              Krishna Textiles supplies retailers, boutiques, garment exporters, and institutional buyers across
+              Krishna Jawli Stores supplies retailers, boutiques, garment exporters, and institutional buyers across
               India with genuine branded textiles at transparent wholesale mill rates.
             </p>
           </div>

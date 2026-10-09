@@ -1,4 +1,4 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
+﻿const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
 
 export const metadata = {
   title: "Special Offers & Textile Deals | Krishna Jawli Stores Tiruchirappalli",
@@ -10,7 +10,7 @@ export const metadata = {
     "dhotis festival offer",
     "wholesale textile sale Trichy",
     "Krishna Jawli Stores offers",
-    "Krishna Textiles offers",
+    "Krishna Jawli Stores offers",
   ],
   openGraph: {
     title: "Special Offers & Textile Deals | Krishna Jawli Stores",

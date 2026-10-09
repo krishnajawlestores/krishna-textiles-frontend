@@ -1,9 +1,9 @@
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
+﻿const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in";
 
 export const metadata = {
   title: "Wholesale & B2B Bulk Textiles | Krishna Jawli Stores Tiruchirappalli",
   description:
-    "Order wholesale textiles in bulk directly from Krishna Jawli Stores (Krishna Textiles), 39, Parupukkara St, Tiruchirappalli. Tiered factory rates, verified mill quality, and pan-India dealer transport.",
+    "Order wholesale textiles in bulk directly from Krishna Jawli Stores (Krishna Jawli Stores), 39, Parupukkara St, Tiruchirappalli. Tiered factory rates, verified mill quality, and pan-India dealer transport.",
   keywords: [
     "Krishna Jawli Stores wholesale",
     "wholesale textiles Trichy",
@@ -11,7 +11,7 @@ export const metadata = {
     "bulk clothing suppliers Tamil Nadu",
     "textiles Parupukkara street",
     "direct mill price fabrics",
-    "Krishna Textiles wholesale",
+    "Krishna Jawli Stores wholesale",
   ],
   openGraph: {
     title: "Wholesale & B2B Bulk Textiles | Krishna Jawli Stores Tiruchirappalli",

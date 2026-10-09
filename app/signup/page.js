@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -109,7 +109,7 @@ export default function SignUpPage() {
             <Link href="/" className="inline-block mb-8">
               <Image
                 src="/logo.png?v=2"
-                alt="Krishna Textiles"
+                alt="Krishna Jawli Stores"
                 width={170}
                 height={45}
                 className="h-10 w-auto object-contain"

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import {
   Package,
@@ -48,7 +48,7 @@ export default function WhyShop() {
       <div className="container-x text-center">
         {/* Section Header */}
         <span className="section-tag block mb-1">
-          The Krishna Textiles Advantage
+          The Krishna Jawli Stores Advantage
         </span>
         <h2 className="text-xl sm:text-2xl font-extrabold text-[#0c2340] mb-2">
           Why Over 50,000+ Customers & 500+ Dealers Choose Us

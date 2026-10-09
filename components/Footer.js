@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
@@ -73,7 +73,7 @@ const footerLinks = {
     { label: "Institutional Uniforms", href: "/wholesale" },
   ],
   "Company Information": [
-    { label: "About Krishna Textiles", href: "/about" },
+    { label: "About Krishna Jawli Stores", href: "/about" },
     { label: "Erode & Tiruppur Sourcing", href: "/about" },
     { label: "Partner Brands Directory", href: "/brands" },
     { label: "Store Locations & Hubs", href: "/contact" },
@@ -170,7 +170,7 @@ export default function Footer() {
             <Link href="/" className="inline-block">
               <Image
                 src="/logo.png?v=2"
-                alt="Krishna Textiles"
+                alt="Krishna Jawli Stores"
                 width={180}
                 height={48}
                 className="h-10 w-auto object-contain"
@@ -240,7 +240,7 @@ export default function Footer() {
       {/* Bottom Copyright Bar */}
       <div className="border-t border-white/10 bg-[#05101d] py-3 text-slate-400 text-[11px]">
         <div className="container-x flex flex-col sm:flex-row items-center justify-between gap-2">
-          <p>© {new Date().getFullYear()} Krishna Textiles E-Commerce Ltd. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Krishna Jawli Stores E-Commerce Ltd. All rights reserved.</p>
           <div className="flex items-center gap-4 text-slate-400">
             <Link href="/page/terms-and-conditions" className="hover:text-white">Privacy Policy</Link>
             <Link href="/page/terms-and-conditions" className="hover:text-white">Terms of Sale</Link>

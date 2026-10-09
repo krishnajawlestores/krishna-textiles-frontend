@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -371,7 +371,7 @@ export default function Header() {
             <Link href="/" className="flex items-center shrink-0 select-none">
               <Image
                 src="/logo.png?v=2"
-                alt="Krishna Textiles"
+                alt="Krishna Jawli Stores"
                 width={170}
                 height={45}
                 className="h-9 sm:h-10 w-auto object-contain"
@@ -660,7 +660,7 @@ export default function Header() {
                 <Link href="/" onClick={() => setMobileMenuOpen(false)}>
                   <Image
                     src="/logo.png?v=2"
-                    alt="Krishna Textiles"
+                    alt="Krishna Jawli Stores"
                     width={150}
                     height={40}
                     className="h-8 w-auto object-contain"

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -52,7 +52,7 @@ export default function BrandsPage() {
             Explore 100% Genuine Partner Brands
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
-            All brand merchandise listed on Krishna Textiles is sourced directly from authorized regional distribution channels with certified authenticity guarantees.
+            All brand merchandise listed on Krishna Jawli Stores is sourced directly from authorized regional distribution channels with certified authenticity guarantees.
           </p>
         </div>
 
