@@ -1,4 +1,4 @@
-﻿import "./globals.css";
+import "./globals.css";
 import LayoutWrapper from "@/components/LayoutWrapper";
 import { CartProvider } from "@/components/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
@@ -6,6 +6,11 @@ import { WishlistProvider } from "@/context/WishlistContext";
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://krishnajawlistores.in"),
+  icons: {
+    icon: "/FavIcon.png",
+    shortcut: "/FavIcon.png",
+    apple: "/FavIcon.png",
+  },
   title: {
     default: "Krishna Jawli Stores | Tiruchirappalli Wholesale & Retail Textiles",
     template: "%s | Krishna Jawli Stores",
