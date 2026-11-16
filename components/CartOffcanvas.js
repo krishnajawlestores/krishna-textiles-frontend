@@ -1,14 +1,31 @@
 "use client";
 
 import { useCart } from "./CartContext";
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck } from "lucide-react";
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, ShieldCheck, Truck, AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { api } from "@/lib/api";
 
 export default function CartOffcanvas() {
   const { isCartOpen, closeCart, items, updateQty, removeFromCart, subtotal, mrpTotal, count } = useCart();
+  const [storeSettings, setStoreSettings] = useState(null);
+
+  useEffect(() => {
+    async function loadSettings() {
+      try {
+        const s = await api.settings.get();
+        if (s) setStoreSettings(s);
+      } catch (e) {}
+    }
+    loadSettings();
+  }, []);
+
+  const minOrderValue = storeSettings?.minOrderValue !== undefined ? Number(storeSettings.minOrderValue) : 2999;
+  const isBelowMinOrder = subtotal < minOrderValue;
+  const amountNeededForMinOrder = Math.max(0, minOrderValue - subtotal);
+
   const savings = mrpTotal - subtotal;
-  const freeShippingThreshold = 999;
+  const freeShippingThreshold = storeSettings?.freeShippingThreshold !== undefined ? Number(storeSettings.freeShippingThreshold) : 999;
   const isFreeShipping = subtotal >= freeShippingThreshold;
   const amountNeededForFreeShipping = freeShippingThreshold - subtotal;
   const shippingCharge = isFreeShipping || items.length === 0 ? 0 : 49;
@@ -55,6 +72,25 @@ export default function CartOffcanvas() {
               <X size={20} />
             </button>
           </div>
+
+          {/* Minimum Order Value Alert & Progress */}
+          {items.length > 0 && isBelowMinOrder && (
+            <div className="bg-amber-50 px-4 py-2.5 border-b border-amber-200 text-xs">
+              <div className="flex justify-between text-amber-950 font-bold mb-1">
+                <span className="flex items-center gap-1">
+                  <AlertCircle size={13} className="text-amber-600" />
+                  Min Order: Add <strong className="text-[#d32f2f]">₹{amountNeededForMinOrder.toLocaleString()}</strong> more
+                </span>
+                <span className="font-mono text-slate-700">₹{subtotal}/₹{minOrderValue}</span>
+              </div>
+              <div className="w-full h-1.5 bg-amber-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-amber-600 transition-all duration-300"
+                  style={{ width: `${Math.min(100, (subtotal / minOrderValue) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Free Shipping Progress Bar */}
           {items.length > 0 && (
@@ -222,9 +258,20 @@ export default function CartOffcanvas() {
                 <Link
                   href="/cart"
                   onClick={closeCart}
-                  className="flex-[2] py-2.5 px-3 bg-[#d32f2f] hover:bg-[#b71c1c] text-white rounded text-center text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 shadow-sm transition-colors"
+                  className={`flex-[2] py-2.5 px-3 rounded text-center text-xs font-bold tracking-wide flex items-center justify-center gap-1.5 shadow-sm transition-colors ${
+                    isBelowMinOrder
+                      ? "bg-amber-600 hover:bg-amber-700 text-white"
+                      : "bg-[#d32f2f] hover:bg-[#b71c1c] text-white"
+                  }`}
                 >
-                  Proceed to Checkout <ArrowRight size={14} />
+                  {isBelowMinOrder ? (
+                    <span>Min Order ₹{minOrderValue.toLocaleString()} (View Cart)</span>
+                  ) : (
+                    <>
+                      <span>Proceed to Checkout</span>
+                      <ArrowRight size={14} />
+                    </>
+                  )}
                 </Link>
               </div>
 

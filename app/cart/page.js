@@ -97,11 +97,38 @@ export default function CartPage() {
     }
   }, [user]);
 
+  // Load dynamic store settings (Minimum order value, GST %, invoice discount %)
+  const [storeSettings, setStoreSettings] = useState(null);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const s = await api.settings.get();
+        if (s) setStoreSettings(s);
+      } catch (err) {
+        console.warn("Failed to load store settings:", err);
+      }
+    }
+    fetchSettings();
+  }, []);
+
+  const minOrderValue = storeSettings?.minOrderValue !== undefined ? Number(storeSettings.minOrderValue) : 2999;
+  const isBelowMinOrder = subtotal < minOrderValue;
+  const amountNeededForMinOrder = Math.max(0, minOrderValue - subtotal);
+
+  const gstRate = storeSettings?.gstRate !== undefined ? Number(storeSettings.gstRate) : 5.0;
+  const defaultDiscountRate = storeSettings?.defaultDiscountRate !== undefined ? Number(storeSettings.defaultDiscountRate) : 5.0;
+
+  // Default 5% invoice discount
+  const invoiceDiscount = Math.round((subtotal * defaultDiscountRate) / 100);
+  const taxableSubtotal = Math.max(0, subtotal - invoiceDiscount);
+  const gstAmount = Math.round((taxableSubtotal * gstRate) / 100);
+
   const savings = mrpTotal - subtotal;
-  const freeShippingThreshold = 999;
+  const freeShippingThreshold = storeSettings?.freeShippingThreshold !== undefined ? Number(storeSettings.freeShippingThreshold) : 999;
   const isFreeShipping = subtotal >= freeShippingThreshold;
   const shipping = isFreeShipping || items.length === 0 ? 0 : 49;
-  const total = subtotal + shipping;
+  const total = taxableSubtotal + gstAmount + shipping;
   const deliveryWindow = getDeliveryDateString(3, 5);
 
   // Determine active delivery address
@@ -125,6 +152,10 @@ export default function CartPage() {
   // Step 1 to Step 2
   const handleProceedToAddress = () => {
     if (items.length === 0) return;
+    if (isBelowMinOrder) {
+      setError(`Minimum order value is ₹${minOrderValue.toLocaleString('en-IN')}. Please add ₹${amountNeededForMinOrder.toLocaleString('en-IN')} more to proceed to checkout.`);
+      return;
+    }
     setError("");
     setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -192,6 +223,12 @@ export default function CartPage() {
   // Step 3: Place real order without payment
   const handlePlaceOrder = async () => {
     setError("");
+
+    if (isBelowMinOrder) {
+      setError(`Minimum order value is ₹${minOrderValue.toLocaleString('en-IN')}. Current cart subtotal is ₹${subtotal.toLocaleString('en-IN')}. Please add ₹${amountNeededForMinOrder.toLocaleString('en-IN')} more to place your order.`);
+      return;
+    }
+
     setSubmitting(true);
 
     const activeAddr = getActiveAddress();
@@ -487,6 +524,31 @@ export default function CartPage() {
       {currentStep === 1 && (
         <div className="grid lg:grid-cols-[1fr_360px] gap-6 items-start">
           <div className="space-y-4">
+            {/* Minimum Order Value Alert */}
+            {items.length > 0 && isBelowMinOrder && (
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-400 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm animate-in fade-in duration-200">
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-black text-base shrink-0 shadow-sm mt-0.5">
+                    !
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-amber-950 uppercase tracking-wide">
+                      Minimum Order Value of ₹{minOrderValue.toLocaleString('en-IN')} Required
+                    </h4>
+                    <p className="text-xs text-amber-900 mt-0.5 leading-relaxed">
+                      Your current cart subtotal is <strong>₹{subtotal.toLocaleString('en-IN')}</strong>. Please add <strong className="text-[#d32f2f]">₹{amountNeededForMinOrder.toLocaleString('en-IN')}</strong> more to your cart to proceed to checkout.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/category/all"
+                  className="px-4 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs whitespace-nowrap shadow-sm transition-colors cursor-pointer shrink-0"
+                >
+                  + Add More Items
+                </Link>
+              </div>
+            )}
+
             <div className="flex justify-between items-center">
               <h2 className="text-base font-extrabold text-[#0c2340]">
                 Review Items ({items.length} textiles)
@@ -633,15 +695,23 @@ export default function CartPage() {
 
             <div className="space-y-2.5 text-xs text-slate-600">
               <div className="flex justify-between">
-                <span>Items MRP ({items.length} items)</span>
-                <span className="font-medium text-slate-800">₹{mrpTotal.toLocaleString()}</span>
+                <span>Items Subtotal</span>
+                <span className="font-medium text-slate-800">₹{subtotal.toLocaleString()}</span>
               </div>
-              {savings > 0 && (
+              {invoiceDiscount > 0 && (
                 <div className="flex justify-between text-green-700 font-medium">
-                  <span>Product Discount</span>
-                  <span>- ₹{savings.toLocaleString()}</span>
+                  <span>Default Discount ({defaultDiscountRate}%)</span>
+                  <span>- ₹{invoiceDiscount.toLocaleString()}</span>
                 </div>
               )}
+              <div className="flex justify-between text-slate-700 font-semibold border-t border-slate-100 pt-1">
+                <span>Taxable Value</span>
+                <span>₹{taxableSubtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>GST ({gstRate}%)</span>
+                <span>₹{gstAmount.toLocaleString()}</span>
+              </div>
               <div className="flex justify-between">
                 <span>Direct Mill Shipping</span>
                 <span className="font-medium text-slate-800">
@@ -651,10 +721,6 @@ export default function CartPage() {
                     `₹${shipping}`
                   )}
                 </span>
-              </div>
-              <div className="flex justify-between text-slate-500">
-                <span>GST (Included)</span>
-                <span>₹{Math.round(subtotal * 0.05).toLocaleString()} (5%)</span>
               </div>
             </div>
 
@@ -669,16 +735,27 @@ export default function CartPage() {
             </div>
 
             <div className="border-t border-dashed border-slate-200 pt-3 flex justify-between font-extrabold text-base text-[#0c2340]">
-              <span>Subtotal Payable</span>
+              <span>Final Total Payable</span>
               <span>₹{total.toLocaleString()}</span>
             </div>
 
             <button
               onClick={handleProceedToAddress}
-              className="btn-primary w-full py-3 rounded font-bold text-xs flex items-center justify-center gap-2 shadow cursor-pointer"
+              disabled={isBelowMinOrder}
+              className={`w-full py-3 rounded font-bold text-xs flex items-center justify-center gap-2 shadow transition-all ${
+                isBelowMinOrder
+                  ? "bg-slate-300 text-slate-600 cursor-not-allowed shadow-none"
+                  : "btn-primary cursor-pointer"
+              }`}
             >
-              <span>Continue to Delivery Address</span>
-              <ArrowRight size={14} />
+              {isBelowMinOrder ? (
+                <span>Min Order ₹{minOrderValue.toLocaleString()} (Add ₹{amountNeededForMinOrder.toLocaleString()} more)</span>
+              ) : (
+                <>
+                  <span>Continue to Delivery Address</span>
+                  <ArrowRight size={14} />
+                </>
+              )}
             </button>
 
             <p className="text-[10px] text-slate-400 text-center flex items-center justify-center gap-1">
@@ -1098,12 +1175,24 @@ export default function CartPage() {
                 <span>Items Subtotal</span>
                 <span className="font-medium text-slate-800">₹{subtotal.toLocaleString()}</span>
               </div>
-              {savings > 0 && (
+              {invoiceDiscount > 0 && (
                 <div className="flex justify-between text-green-700 font-medium">
-                  <span>Total Discount</span>
-                  <span>- ₹{savings.toLocaleString()}</span>
+                  <span>Default Invoice Discount ({defaultDiscountRate}%)</span>
+                  <span>- ₹{invoiceDiscount.toLocaleString()}</span>
                 </div>
               )}
+              <div className="flex justify-between text-slate-700 font-semibold border-t border-slate-100 pt-1">
+                <span>Taxable Value</span>
+                <span>₹{taxableSubtotal.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>CGST ({(gstRate / 2).toFixed(1)}%)</span>
+                <span>₹{(gstAmount / 2).toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>SGST ({(gstRate / 2).toFixed(1)}%)</span>
+                <span>₹{(gstAmount / 2).toFixed(2)}</span>
+              </div>
               <div className="flex justify-between">
                 <span>Mill Shipping</span>
                 <span className="font-medium text-slate-800">
@@ -1114,23 +1203,25 @@ export default function CartPage() {
                   )}
                 </span>
               </div>
-              <div className="flex justify-between text-slate-500">
-                <span>Applicable GST</span>
-                <span>₹{Math.round(subtotal * 0.05).toLocaleString()} (5%)</span>
-              </div>
             </div>
 
             <div className="border-t border-dashed border-slate-200 pt-3 flex justify-between font-extrabold text-base text-[#0c2340]">
-              <span>Grand Total</span>
+              <span>Final Grand Total</span>
               <span>₹{total.toLocaleString()}</span>
             </div>
 
             <button
               onClick={handlePlaceOrder}
-              disabled={submitting}
-              className="btn-red w-full py-3.5 rounded font-bold text-xs flex items-center justify-center gap-2 shadow disabled:opacity-60 cursor-pointer"
+              disabled={submitting || isBelowMinOrder}
+              className={`w-full py-3.5 rounded font-bold text-xs flex items-center justify-center gap-2 shadow transition-all ${
+                isBelowMinOrder
+                  ? "bg-slate-300 text-slate-500 cursor-not-allowed shadow-none"
+                  : "btn-red cursor-pointer disabled:opacity-60"
+              }`}
             >
-              {submitting ? (
+              {isBelowMinOrder ? (
+                <span>Min Order ₹{minOrderValue.toLocaleString()} Required</span>
+              ) : submitting ? (
                 <span>Placing Order in Database...</span>
               ) : (
                 <>

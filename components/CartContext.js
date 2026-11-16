@@ -44,7 +44,29 @@ export function CartProvider({ children }) {
 
   function addToCart(product, size, qty = 1, openDrawer = true, customUnitPrice = null, color = null, itemImageUrl = null) {
     const rawCategory = product.category?.slug || product.categoryId || product.category || "";
-    const basePrice = Number(product.price) || 0;
+
+    // Check if product has size-specific variants
+    let variantPrice = null;
+    let variantMrp = null;
+    let variantStock = null;
+    if (Array.isArray(product.sizeVariants) && product.sizeVariants.length > 0 && size) {
+      const foundV = product.sizeVariants.find((v) => String(v.size) === String(size));
+      if (foundV) {
+        variantPrice = Number(foundV.price);
+        if (foundV.mrp) variantMrp = Number(foundV.mrp);
+        if (foundV.stock !== undefined) variantStock = Number(foundV.stock);
+      }
+    }
+
+    const basePrice =
+      customUnitPrice !== null
+        ? Number(customUnitPrice)
+        : variantPrice !== null
+        ? variantPrice
+        : Number(product.price) || 0;
+    const itemMrp = variantMrp !== null ? variantMrp : Number(product.mrp) || basePrice;
+    const itemStock = variantStock !== null ? variantStock : Number(product.stock) || 0;
+
     const finalUnitPrice =
       customUnitPrice !== null
         ? Number(customUnitPrice)
@@ -76,12 +98,12 @@ export function CartProvider({ children }) {
           brand: product.brand,
           basePrice,
           price: finalUnitPrice,
-          mrp: product.mrp,
+          mrp: itemMrp,
           imageUrl: resolvedImageUrl,
           color: itemColor,
           category: product.category,
           categorySlug: rawCategory,
-          stock: product.stock,
+          stock: itemStock,
           size,
           qty,
         },

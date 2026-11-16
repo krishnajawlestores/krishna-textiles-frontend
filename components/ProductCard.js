@@ -136,9 +136,20 @@ export default function ProductCard({ product }) {
 
           {/* Price details */}
           <div className="flex items-baseline gap-2 flex-wrap">
-            <span className="text-sm sm:text-base font-extrabold text-[#0c2340]">
-              ₹{product.price?.toLocaleString()}
-            </span>
+            {Array.isArray(product.sizeVariants) && product.sizeVariants.length > 0 ? (
+              <div className="flex items-center gap-1.5">
+                <span className="text-sm sm:text-base font-extrabold text-[#0c2340]">
+                  From ₹{Math.min(...product.sizeVariants.map((v) => Number(v.price) || 0)).toLocaleString()}
+                </span>
+                <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  {product.sizeVariants.length} Sizes
+                </span>
+              </div>
+            ) : (
+              <span className="text-sm sm:text-base font-extrabold text-[#0c2340]">
+                ₹{product.price?.toLocaleString()}
+              </span>
+            )}
             {product.mrp > product.price && (
               <span className="text-xs text-slate-400 line-through">
                 ₹{product.mrp?.toLocaleString()}

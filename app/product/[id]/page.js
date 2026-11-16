@@ -91,9 +91,17 @@ export default function ProductPage({ params }) {
     load();
   }, [id]);
 
-  const price = Number(product?.price) || 0;
-  const mrp = Number(product?.mrp) || 0;
-  const stock = Number(product?.stock) || 0;
+  // Support Size & Price Variants
+  const hasVariants = Array.isArray(product?.sizeVariants) && product.sizeVariants.length > 0;
+  const currentVariant = hasVariants ? product.sizeVariants.find((v) => String(v.size) === String(size)) : null;
+
+  const baseProductPrice = Number(product?.price) || 0;
+  const baseProductMrp = Number(product?.mrp) || baseProductPrice;
+  const baseProductStock = Number(product?.stock) || 0;
+
+  const price = currentVariant ? (Number(currentVariant.price) || 0) : baseProductPrice;
+  const mrp = currentVariant && currentVariant.mrp ? Number(currentVariant.mrp) : baseProductMrp;
+  const stock = currentVariant && currentVariant.stock !== undefined ? Number(currentVariant.stock) : baseProductStock;
 
   // Derive the category identifier for bulk-discount eligibility
   const catIdentifier =
@@ -350,23 +358,49 @@ export default function ProductPage({ params }) {
               <div className="mb-4">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    Select Size: <strong className="text-[#0c2340]">{size}</strong>
+                    Select Size: <strong className="text-[#0c2340]">{size} {currentVariant ? `(₹${currentVariant.price})` : ''}</strong>
                   </span>
+                  {currentVariant && currentVariant.stock <= 5 && currentVariant.stock > 0 && (
+                    <span className="text-[11px] text-amber-700 font-semibold bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                      Only {currentVariant.stock} left in Size {size}
+                    </span>
+                  )}
+                  {currentVariant && currentVariant.stock <= 0 && (
+                    <span className="text-[11px] text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                      Size {size} Out of Stock
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSize(s)}
-                      className={`px-3.5 py-1.5 rounded text-xs font-bold border transition-all ${
-                        size === s
-                          ? "bg-[#0c2340] text-white border-[#0c2340] shadow-sm"
-                          : "bg-white text-slate-700 border-slate-300 hover:border-slate-500"
-                      }`}
-                    >
-                      {s}
-                    </button>
-                  ))}
+                  {product.sizes.map((s) => {
+                    const variantForSize = hasVariants ? product.sizeVariants.find((v) => String(v.size) === String(s)) : null;
+                    const isSelected = size === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSize(s)}
+                        className={`px-3.5 py-1.5 rounded text-xs font-bold border transition-all flex items-center gap-1.5 cursor-pointer ${
+                          isSelected
+                            ? "bg-[#0c2340] text-white border-[#0c2340] shadow-sm ring-2 ring-[#0c2340]/20"
+                            : "bg-white text-slate-700 border-slate-300 hover:border-slate-500"
+                        }`}
+                      >
+                        <span>{s}</span>
+                        {variantForSize && (
+                          <span
+                            className={`text-[10px] font-mono px-1 py-0.2 rounded font-bold ${
+                              isSelected
+                                ? "bg-white/20 text-white"
+                                : "bg-slate-100 text-indigo-700"
+                            }`}
+                          >
+                            ₹{variantForSize.price}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
